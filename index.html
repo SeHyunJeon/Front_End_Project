@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Front-End 과제</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<div id="app" class="container mt-5">
+    <h1 class="mb-4">Front-End 과제</h1>
+
+    <div v-for="(year, index) in years" :key="index" class="mb-5">
+        <h2>{{ year.name }}학년</h2>
+
+        <div class="mb-3">
+            <button @click="showAddSubjectForm(year)" class="btn btn-success">과목 추가</button>
+            <button @click="saveData(year)" class="btn btn-primary">저장</button>
+            <button @click="deleteSubject(year, subjectIndex)" class="btn btn-danger btn-sm">삭제</button>
+        </div>
+
+        <table class="table table-bordered table-striped table-hover bg-light">
+            <thead>
+            <tr>
+                <th scope="col">이수</th>
+                <th scope="col">필수</th>
+                <th scope="col">과목명</th>
+                <th scope="col">학점</th>
+                <th scope="col">출석점수</th>
+                <th scope="col">과제점수</th>
+                <th scope="col">중간고사</th>
+                <th scope="col">기말고사</th>
+                <th scope="col">총점</th>
+                <th scope="col">성적</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr v-for="(subject, subjectIndex) in year.subjects" :key="subjectIndex">
+                <td>{{ subject.isu }}</td>
+                <td>{{ subject.required }}</td>
+                <td>{{ subject.subjectName }}</td>
+                <td>{{ subject.credit }}</td>
+                <td>{{ subject.attendanceScore }}</td>
+                <td>{{ subject.assignmentScore }}</td>
+                <td>{{ subject.midtermScore }}</td>
+                <td>{{ subject.finalScore }}</td>
+                <td>{{ subject.midtermScore + subject.finalScore + subject.assignmentScore + subject.attendanceScore }}</td>
+                <td>{{ subject.grade }}</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <div v-if="year.showAddSubjectForm">
+            <h3>과목 추가</h3>
+            <form @submit.prevent="addSubject(year)">
+                <div class="mb-3">
+                    <label for="isu">이수</label>
+                    <input type="text" id="isu" v-model="year.newSubject.isu" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="required">필수</label>
+                    <input type="text" id="required" v-model="year.newSubject.required" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="subjectName">과목명</label>
+                    <input type="text" id="subjectName" v-model="year.newSubject.subjectName" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="credit">학점</label>
+                    <input type="number" id="credit" v-model="year.newSubject.credit" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="attendanceScore">출석점수</label>
+                    <input type="number" id="attendanceScore" v-model="year.newSubject.attendanceScore" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="assignmentScore">과제점수</label>
+                    <input type="number" id="assignmentScore" v-model="year.newSubject.assignmentScore" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="midtermScore">중간고사</label>
+                    <input type="number" id="midtermScore" v-model="year.newSubject.midtermScore" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <label for="finalScore">기말고사</label>
+                    <input type="number" id="finalScore" v-model="year.newSubject.finalScore" required class="form-control">
+                </div>
+                <button type="submit" class="btn btn-primary">추가</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+<!-- Bootstrap JS (popper.js and bootstrap.js) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            years: [
+                {
+                    name: '1',
+                    subjects: [],
+                    showAddSubjectForm: false,
+                    newSubject: {
+                        isu: '',
+                        required: '',
+                        subjectName: '',
+                        credit: 0,
+                        attendanceScore: 0,
+                        assignmentScore: 0,
+                        midtermScore: 0,
+                        finalScore: 0,
+                    },
+                },
+                {
+                    name: '2',
+                    subjects: [],
+                    showAddSubjectForm: false,
+                    newSubject: {
+                        isu: '',
+                        required: '',
+                        subjectName: '',
+                        credit: 0,
+                        attendanceScore: 0,
+                        assignmentScore: 0,
+                        midtermScore: 0,
+                        finalScore: 0,
+                    },
+                },
+                {
+                    name: '3',
+                    subjects: [],
+                    showAddSubjectForm: false,
+                    newSubject: {
+                        isu: '',
+                        required: '',
+                        subjectName: '',
+                        credit: 0,
+                        attendanceScore: 0,
+                        assignmentScore: 0,
+                        midtermScore: 0,
+                        finalScore: 0,
+                    },
+                },
+            ],
+        },
+        mounted() {
+            this.calculateTotalAndAverage();
+        },
+        methods: {
+            calculateTotalAndAverage() {
+                this.years.forEach(year => {
+                    year.subjects.forEach(subject => {
+                        subject.totalScore = subject.midtermScore + subject.finalScore + subject.assignmentScore + subject.attendanceScore;
+                        if (subject.totalScore >= 90) {
+                            subject.grade = 'A0';
+                        } else if (subject.totalScore >= 80) {
+                            subject.grade = 'B0';
+                        } else if (subject.totalScore >= 70) {
+                            subject.grade = 'C0';
+                        } else {
+                            subject.grade = 'F';
+                        }
+                    });
+                });
+            },
+            showAddSubjectForm(year) {
+                year.showAddSubjectForm = true;
+            },
+            addSubject(year) {
+                if (
+                    year.newSubject.isu.trim() === '' ||
+                    year.newSubject.required.trim() === '' ||
+                    year.newSubject.subjectName.trim() === '' ||
+                    year.newSubject.credit <= 0 ||
+                    year.newSubject.attendanceScore < 0 ||
+                    year.newSubject.assignmentScore < 0 ||
+                    year.newSubject.midtermScore < 0 ||
+                    year.newSubject.finalScore < 0
+                ) {
+                    alert('모든 필드를 입력하세요.');
+                    return;
+                }
+
+                year.subjects.push({
+                    isu: year.newSubject.isu,
+                    required: year.newSubject.required,
+                    subjectName: year.newSubject.subjectName,
+                    credit: year.newSubject.credit,
+                    attendanceScore: year.newSubject.attendanceScore,
+                    assignmentScore: year.newSubject.assignmentScore,
+                    midtermScore: year.newSubject.midtermScore,
+                    finalScore: year.newSubject.finalScore,
+                    totalScore: 0,
+                    grade: '',
+                });
+
+                year.newSubject.isu = '';
+                year.newSubject.required = '';
+                year.newSubject.subjectName = '';
+                year.newSubject.credit = 0;
+                year.newSubject.attendanceScore = 0;
+                year.newSubject.assignmentScore = 0;
+                year.newSubject.midtermScore = 0;
+                year.newSubject.finalScore = 0;
+
+                year.showAddSubjectForm = false;
+
+                this.calculateTotalAndAverage();
+            },
+            deleteSubject(year, subjectIndex) {
+                year.subjects.splice(subjectIndex, 1);
+                this.calculateTotalAndAverage();
+            },
+            saveData(year) {
+                console.log(`[${year.name}학년] 데이터 저장 완료`);
+            },
+        },
+    });
+</script>
+
+</body>
+</html>
